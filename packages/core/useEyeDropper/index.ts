@@ -1,5 +1,5 @@
 import { ref } from 'vue-demi'
-import { tryOnMounted } from '@vueuse/shared'
+import { tryOnBeforeMount } from '@vueuse/shared'
 export interface EyeDropperOpenOptions {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
@@ -35,7 +35,7 @@ export function useEyeDropper(options: UseEyeDropperOptions = {}) {
   const isSupported = ref(false)
   const open = ref()
 
-  tryOnMounted(() => {
+  tryOnBeforeMount(() => {
     isSupported.value = Boolean(typeof window !== 'undefined' && 'EyeDropper' in window)
 
     open.value = async(openOptions?: EyeDropperOpenOptions) => {
