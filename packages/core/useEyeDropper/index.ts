@@ -1,6 +1,4 @@
 import { ref } from 'vue-demi'
-import { defaultWindow } from '../_configurable'
-import type { ConfigurableWindow } from '../_configurable'
 
 export interface EyeDropperOpenOptions {
   /**
@@ -31,8 +29,8 @@ export interface UseEyeDropperOptions {
  * @see https://vueuse.org/useEyeDropper
  * @param initialValue string
  */
-export function useEyeDropper(options: UseEyeDropperOptions & ConfigurableWindow = {}) {
-  const { initialValue = '', window = defaultWindow } = options
+export function useEyeDropper(options: UseEyeDropperOptions = {}) {
+  const { initialValue = '' } = options
   const isSupported = Boolean(typeof window !== 'undefined' && 'EyeDropper' in window)
   const sRGBHex = ref(initialValue)
 
