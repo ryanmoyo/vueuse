@@ -1,7 +1,5 @@
 import { ref } from 'vue-demi'
-import { defaultWindow } from '../_configurable'
-import type { ConfigurableWindow } from '../_configurable'
-
+import { tryOnMounted } from '@vueuse/shared'
 export interface EyeDropperOpenOptions {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
@@ -31,19 +29,24 @@ export interface UseEyeDropperOptions {
  * @see https://vueuse.org/useEyeDropper
  * @param initialValue string
  */
-export function useEyeDropper(options: UseEyeDropperOptions & ConfigurableWindow = {}) {
-  const { initialValue = '', window = defaultWindow } = options
-  const isSupported = Boolean(typeof window !== 'undefined' && 'EyeDropper' in window)
+export function useEyeDropper(options: UseEyeDropperOptions = {}) {
+  const { initialValue = '' } = options
   const sRGBHex = ref(initialValue)
+  const isSupported = ref(false)
+  const open = ref()
 
-  async function open(openOptions?: EyeDropperOpenOptions) {
-    if (!isSupported)
-      return
-    const eyeDropper: EyeDropper = new (window as any).EyeDropper()
-    const result = await eyeDropper.open(openOptions)
-    sRGBHex.value = result.sRGBHex
-    return result
-  }
+  tryOnMounted(() => {
+    isSupported.value = Boolean(typeof window !== 'undefined' && 'EyeDropper' in window)
+
+    open.value = async(openOptions?: EyeDropperOpenOptions) => {
+      if (!isSupported)
+        return
+      const eyeDropper: EyeDropper = new (window as any).EyeDropper()
+      const result = await eyeDropper.open(openOptions)
+      sRGBHex.value = result.sRGBHex
+      return result
+    }
+  })
 
   return { isSupported, sRGBHex, open }
 }
